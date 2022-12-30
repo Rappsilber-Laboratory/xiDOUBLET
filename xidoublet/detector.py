@@ -120,6 +120,11 @@ class SpectrumProcessor:
         if len(doublets) > 0:
             doublets_result = np.hstack(doublets)
 
+            # filter by 2nd peptide mass
+            if config.second_peptide_mass_filter != -1:
+                doublets_result = doublets_result[
+                    doublets_result['2nd_peptide_mass'] >= config.second_peptide_mass_filter]
+
             # cap doublets
             if config.cap != -1:
                 doublet_sort = np.argsort(np.fmin(doublets_result['peak0_rank'],

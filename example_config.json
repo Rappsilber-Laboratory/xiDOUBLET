@@ -4,6 +4,7 @@
   "doublet": {
     "stubs": ["a", "t"],
     "rank_cutoff": 20,
-    "cap": 4
+    "cap": 4,
+    "second_peptide_mass_filter": 500
   }
 }

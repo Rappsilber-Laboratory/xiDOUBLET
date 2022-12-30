@@ -346,6 +346,9 @@ class DoubletConfig(ConfigGroup):
     """Cap the number of doublets to be detected"""
     cap = Setting(int, -1)
 
+    """Filter out doublets by remaining mass of the second peptide."""
+    second_peptide_mass_filter = Setting(float, -1)
+
 
 class Config(ConfigGroup):
     """Top level configuration for a search."""
