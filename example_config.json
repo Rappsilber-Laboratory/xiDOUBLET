@@ -1,0 +1,7 @@
+{
+  "ms2_tol": "5ppm",
+  "crosslinker": "DSSO",
+  "doublet": {
+    "stubs": ["a", "t"]
+  }
+}
