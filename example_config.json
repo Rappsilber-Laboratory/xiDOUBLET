@@ -2,6 +2,8 @@
   "ms2_tol": "5ppm",
   "crosslinker": "DSSO",
   "doublet": {
-    "stubs": ["a", "t"]
+    "stubs": ["a", "t"],
+    "rank_cutoff": 20,
+    "cap": 4
   }
 }
