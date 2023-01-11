@@ -1,5 +1,4 @@
-from xidoublet.filters import IsotopeDetector, IsotopeReducer, RelativeIntensityFilter, \
-    IntensityRankFilter
+from xidoublet.filters import IsotopeDetector, IsotopeReducer
 from xidoublet import doublet
 import numpy as np
 from numpy.lib import recfunctions
@@ -18,16 +17,6 @@ class SearchContext:
         # init spectrum filters
         self.isotope_detector = IsotopeDetector(self)
         self.isotope_reducer = IsotopeReducer()
-
-        if config.doublet.intensity_cutoff != -1:
-            self.cutoff = config.doublet.intensity_cutoff
-            self.noise_filter = RelativeIntensityFilter()
-        elif config.doublet.rank_cutoff != -1:
-            self.cutoff = config.doublet.rank_cutoff
-            self.noise_filter = IntensityRankFilter()
-        else:
-            self.cutoff = None
-            self.noise_filter = None
 
         # setup stub masses
         stub1 = next((x for x in self.crosslinker.cleavage_stubs
@@ -76,16 +65,10 @@ class SpectrumProcessor:
         ]
 
         # spectrum processing
-        # rel intensity or rank cutoff before isotope detection
-        if config.cutoff_point == 'beforeDeisotoping' and context.noise_filter is not None:
-            filtered_spec = context.noise_filter.process(spectrum, context.cutoff)
-        else:
-            filtered_spec = spectrum
-
         # Isotope detection and reduction
         if context.config.low_resolution:
             # filtered spectrum
-            doublet_spec = filtered_spec
+            doublet_spec = spectrum
             # set isotope cluster related values (they are used for downstream processing)
             doublet_spec.charge_values = np.zeros(doublet_spec.mz_values.size)
             doublet_spec.isotope_cluster_mz_values = doublet_spec.mz_values
@@ -94,13 +77,9 @@ class SpectrumProcessor:
 
         else:
             # filtered spectrum
-            isotope_detected = context.isotope_detector.process(filtered_spec)
+            isotope_detected = context.isotope_detector.process(spectrum)
             isotope_reduced = context.isotope_reducer.process(isotope_detected)
             doublet_spec = isotope_reduced
-
-        # rel intensity or rank cutoff after isotope detection
-        if config.cutoff_point == 'afterDeisotoping' and context.noise_filter is not None:
-            doublet_spec = context.noise_filter.process(doublet_spec, context.cutoff)
 
         doublets = []
         for stub_comb_name, (small_stub, large_stub) in context.stub_combinations.items():
@@ -120,6 +99,10 @@ class SpectrumProcessor:
         if len(doublets) > 0:
             doublets_result = np.hstack(doublets)
 
+            # filter by rank
+            if config.rank_cutoff is not -1:
+                doublet_rank = np.fmin(doublets_result['peak0_rank'], doublets_result['peak1_rank'])
+                doublets_result = doublets_result[doublet_rank <= config.rank_cutoff]
             # filter by 2nd peptide mass
             if config.second_peptide_mass_filter != -1:
                 doublets_result = doublets_result[

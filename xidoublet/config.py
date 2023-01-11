@@ -323,19 +323,8 @@ class DoubletConfig(ConfigGroup):
         if len(self.stubs) != 2:
             raise ValueError("You need to define exactly 2 stubs to use.")
 
-        if self.intensity_cutoff != -1 and self.rank_cutoff != -1:
-            raise ValueError(
-                "Relative intensity cutoff and intensity rank based cutoff are mutually exclusive.")
-
-    """Intensity cutoff relative to the base peak of the spectrum"""
-    intensity_cutoff = Setting(float, -1)
-
-    """Rank based cutoff"""
+    """Doublet rank cutoff. Higher intense peak of the doublet determines the doublet rank."""
     rank_cutoff = Setting(int, -1)
-
-    """Whether to apply the intensity cutoff before or after deisotoping."""
-    cutoff_point = Setting(str, 'afterDeisotoping',
-                           valid_values=('afterDeisotoping', 'beforeDeisotoping'))
 
     """Crosslinker stubs (by name) to use for detection. (atm only 2 stubs are supported)."""
     stubs = ListSetting(str, ['a', 't'])

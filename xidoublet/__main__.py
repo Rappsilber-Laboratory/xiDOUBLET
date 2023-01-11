@@ -117,15 +117,10 @@ if __name__ == '__main__':
     # Validate argument combinations
     validate_options(options)
 
-    out_suffix = ''
-    if config.doublet.intensity_cutoff > 0:
-        out_suffix += f'_{config.doublet.intensity_cutoff}_relIntCut_{config.doublet.cutoff_point}'
-    elif config.doublet.rank_cutoff > 0:
-        out_suffix += f'_{config.doublet.rank_cutoff}_rankCut_{config.doublet.cutoff_point}'
     # make sure the output directory exists
     Path.mkdir(Path(options.out_dir), exist_ok=True, parents=True)
 
-    doublet_out = os.path.join(options.out_dir, f'{options.basename}doublets{out_suffix}.tsv')
+    doublet_out = os.path.join(options.out_dir, f'{options.basename}doublets.tsv')
     doublet_queue, doublet_keep_writing, doublet_writer_process = setup_queued_writing(doublet_out)
 
     log("Loading spectra")
