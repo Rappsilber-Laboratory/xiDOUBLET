@@ -99,10 +99,11 @@ class SpectrumProcessor:
         if len(doublets) > 0:
             doublets_result = np.hstack(doublets)
 
-            # filter by rank
+            # filter by doublet rank
             if config.rank_cutoff != -1:
                 doublet_rank = np.fmin(doublets_result['peak0_rank'], doublets_result['peak1_rank'])
                 doublets_result = doublets_result[doublet_rank <= config.rank_cutoff]
+
             # filter by 2nd peptide mass
             if config.second_peptide_mass_filter != -1:
                 doublets_result = doublets_result[
