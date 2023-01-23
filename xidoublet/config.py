@@ -338,6 +338,9 @@ class DoubletConfig(ConfigGroup):
     """Filter out doublets by remaining mass of the second peptide."""
     second_peptide_mass_filter = Setting(float, -1)
 
+    """Filter to prevent multiple doublets per m/z window."""
+    mz_window_filter = Setting(float, -1)
+
 
 class Config(ConfigGroup):
     """Top level configuration for a search."""

@@ -109,6 +109,22 @@ class SpectrumProcessor:
                 doublets_result = doublets_result[
                     doublets_result['2nd_peptide_mass'] >= config.second_peptide_mass_filter]
 
+            # filter to single doublet per m/z window
+            if config.mz_window_filter != -1:
+                doublet_sort = np.argsort(np.fmin(doublets_result['peak0_rank'],
+                                                  doublets_result['peak1_rank']))
+
+                peak0_mask = doublets_result['peak0_rank'] < doublets_result['peak1_rank']
+                trigger_mz = np.empty(doublets_result.size, dtype=np.float64)
+                trigger_mz[peak0_mask] = doublets_result['peak0_mz'][peak0_mask]
+                trigger_mz[~peak0_mask] = doublets_result['peak1_mz'][~peak0_mask]
+                doublet_idx = [doublet_sort[0]]
+                for i in range(1, doublet_sort.size):
+                    if not any(np.isclose(trigger_mz[doublet_sort[i]], trigger_mz[doublet_idx],
+                                          atol=config.mz_window_filter)):
+                        doublet_idx.append(doublet_sort[i])
+                doublets_result = doublets_result[doublet_idx]
+
             # cap doublets
             if config.cap != -1:
                 doublet_sort = np.argsort(np.fmin(doublets_result['peak0_rank'],

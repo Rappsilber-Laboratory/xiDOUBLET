@@ -27,7 +27,11 @@ def test_context():
 
 def test_processor():
     cfg = Config(crosslinker=Crosslinker.DSSO, doublet={
-        "stubs": ["a", "t"], "cap": 4, "second_peptide_mass_filter": 500})
+        "stubs": ["a", "t"],
+        "cap": 4,
+        "second_peptide_mass_filter": 500,
+        "mz_window_filter": 1.5
+    })
     ctx = SearchContext(cfg)
 
     # init
