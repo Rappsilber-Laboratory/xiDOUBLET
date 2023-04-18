@@ -323,7 +323,7 @@ class DoubletConfig(ConfigGroup):
         if len(self.stubs) != 2:
             raise ValueError("You need to define exactly 2 stubs to use.")
 
-    """Doublet rank cutoff. Higher intense peak of the doublet determines the doublet rank."""
+    """Doublet rank cutoff. Higher intensity peak of the doublet determines the doublet rank."""
     rank_cutoff = Setting(int, -1)
 
     """Crosslinker stubs (by name) to use for detection. (atm only 2 stubs are supported)."""
