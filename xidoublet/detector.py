@@ -37,6 +37,30 @@ class SearchContext:
             '_'.join([s.name for s in stubs]): (stubs[0].mass, stubs[1].mass),
         }
 
+        # For UCCL/UVPD experiments, we add stub combinations to account for hydrogen shifts
+        # deltaM is B_C and B-1_C-1 (almost no B+1_C+1)
+        # deltaM+1 is mostly B-1_C and to a lesser extent B_C+1
+        # deltaM+2 is actual B-1_C+1
+        # deltaM-1 and deltaM-2 are rarely observed
+        if not config.uccl.hydrogen_shifts == 'none':
+            self.stub_combinations.update({
+                # (B_C)+1: could be B-1_C or B_C+1 (use B-1_C here)
+                f'({stubs[0].name}_{stubs[1].name})+1':
+                    (stubs[0].mass - const.H_MASS, stubs[1].mass),
+                # (B_C)+2: could be B-1_C+1 (or B-2_C)
+                f'({stubs[0].name}_{stubs[1].name})+2':
+                    (stubs[0].mass - const.H_MASS, stubs[1].mass + const.H_MASS),
+            })
+            if config.uccl.hydrogen_shifts == 'wide':
+                self.stub_combinations.update({
+                    # (B_C)-1: could be B_C-1 or B+1_C (use B_C-1 here)
+                    f'({stubs[0].name}_{stubs[1].name})-1':
+                        (stubs[0].mass, stubs[1].mass - const.H_MASS),
+                    # (B_C)+3: could be B-1_C+2 or B-2_C+1 (use B-2_C+1 here)
+                    f'({stubs[0].name}_{stubs[1].name})+3':
+                        (stubs[0].mass - 2*const.H_MASS, stubs[1].mass + const.H_MASS),
+                })
+
 
 class SpectrumProcessor:
     """Class for processing spectra."""

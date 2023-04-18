@@ -341,6 +341,13 @@ class DoubletConfig(ConfigGroup):
     """Filter to prevent multiple doublets per m/z window."""
     mz_window_filter = Setting(float, -1)
 
+    """Account for hydrogen shifts when searching for doublets. Enables search for additional 
+    delta masses that can occur in UVPD experiments.
+    'none': no hydrogen shifts are considered. 
+    'wide': delta masses -1 to +3. 
+    'common': only +1 & +2"""
+    hydrogen_shifts = Setting(str, 'none', valid_values=('none', 'wide', 'common'))
+
 
 class Config(ConfigGroup):
     """Top level configuration for a search."""
