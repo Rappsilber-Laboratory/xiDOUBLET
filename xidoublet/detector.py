@@ -37,6 +37,30 @@ class SearchContext:
             '_'.join([s.name for s in stubs]): (stubs[0].mass, stubs[1].mass),
         }
 
+        # For UCCL/UVPD experiments, we add stub combinations to account for hydrogen shifts
+        # deltaM is B_C and B-1_C-1 (almost no B+1_C+1)
+        # deltaM+1 is mostly B-1_C and to a lesser extent B_C+1
+        # deltaM+2 is actual B-1_C+1
+        # deltaM-1 and deltaM-2 are rarely observed
+        if not config.doublet.hydrogen_shifts == 'none':
+            self.stub_combinations.update({
+                # (B_C)+1: could be B-1_C or B_C+1 (use B-1_C here)
+                f'({stubs[0].name}_{stubs[1].name})+1':
+                    (stubs[0].mass - const.H_MASS, stubs[1].mass),
+                # (B_C)+2: could be B-1_C+1 (or B-2_C)
+                f'({stubs[0].name}_{stubs[1].name})+2':
+                    (stubs[0].mass - const.H_MASS, stubs[1].mass + const.H_MASS),
+            })
+            if config.doublet.hydrogen_shifts == 'wide':
+                self.stub_combinations.update({
+                    # (B_C)-1: could be B_C-1 or B+1_C (use B_C-1 here)
+                    f'({stubs[0].name}_{stubs[1].name})-1':
+                        (stubs[0].mass, stubs[1].mass - const.H_MASS),
+                    # (B_C)+3: could be B-1_C+2 or B-2_C+1 (use B-2_C+1 here)
+                    f'({stubs[0].name}_{stubs[1].name})+3':
+                        (stubs[0].mass - 2*const.H_MASS, stubs[1].mass + const.H_MASS),
+                })
+
 
 class SpectrumProcessor:
     """Class for processing spectra."""
@@ -108,6 +132,22 @@ class SpectrumProcessor:
             if config.second_peptide_mass_filter != -1:
                 doublets_result = doublets_result[
                     doublets_result['2nd_peptide_mass'] >= config.second_peptide_mass_filter]
+
+            # filter to single doublet per m/z window
+            if config.mz_window_filter != -1:
+                doublet_sort = np.argsort(np.fmin(doublets_result['peak0_rank'],
+                                                  doublets_result['peak1_rank']))
+
+                peak0_mask = doublets_result['peak0_rank'] < doublets_result['peak1_rank']
+                trigger_mz = np.empty(doublets_result.size, dtype=np.float64)
+                trigger_mz[peak0_mask] = doublets_result['peak0_mz'][peak0_mask]
+                trigger_mz[~peak0_mask] = doublets_result['peak1_mz'][~peak0_mask]
+                doublet_idx = [doublet_sort[0]]
+                for i in range(1, doublet_sort.size):
+                    if not any(np.isclose(trigger_mz[doublet_sort[i]], trigger_mz[doublet_idx],
+                                          atol=config.mz_window_filter)):
+                        doublet_idx.append(doublet_sort[i])
+                doublets_result = doublets_result[doublet_idx]
 
             # cap doublets
             if config.cap != -1:

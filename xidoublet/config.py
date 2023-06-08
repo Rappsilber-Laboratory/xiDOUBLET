@@ -323,7 +323,7 @@ class DoubletConfig(ConfigGroup):
         if len(self.stubs) != 2:
             raise ValueError("You need to define exactly 2 stubs to use.")
 
-    """Doublet rank cutoff. Higher intense peak of the doublet determines the doublet rank."""
+    """Doublet rank cutoff. Higher intensity peak of the doublet determines the doublet rank."""
     rank_cutoff = Setting(int, -1)
 
     """Crosslinker stubs (by name) to use for detection. (atm only 2 stubs are supported)."""
@@ -337,6 +337,16 @@ class DoubletConfig(ConfigGroup):
 
     """Filter out doublets by remaining mass of the second peptide."""
     second_peptide_mass_filter = Setting(float, -1)
+
+    """Filter to prevent multiple doublets per m/z window."""
+    mz_window_filter = Setting(float, -1)
+
+    """Account for hydrogen shifts when searching for doublets. Enables search for additional 
+    delta masses that can occur in UVPD experiments.
+    'none': no hydrogen shifts are considered. 
+    'wide': delta masses -1 to +3. 
+    'common': only +1 & +2"""
+    hydrogen_shifts = Setting(str, 'none', valid_values=('none', 'wide', 'common'))
 
 
 class Config(ConfigGroup):
