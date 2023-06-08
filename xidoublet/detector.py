@@ -42,7 +42,7 @@ class SearchContext:
         # deltaM+1 is mostly B-1_C and to a lesser extent B_C+1
         # deltaM+2 is actual B-1_C+1
         # deltaM-1 and deltaM-2 are rarely observed
-        if not config.uccl.hydrogen_shifts == 'none':
+        if not config.doublet.hydrogen_shifts == 'none':
             self.stub_combinations.update({
                 # (B_C)+1: could be B-1_C or B_C+1 (use B-1_C here)
                 f'({stubs[0].name}_{stubs[1].name})+1':
@@ -51,7 +51,7 @@ class SearchContext:
                 f'({stubs[0].name}_{stubs[1].name})+2':
                     (stubs[0].mass - const.H_MASS, stubs[1].mass + const.H_MASS),
             })
-            if config.uccl.hydrogen_shifts == 'wide':
+            if config.doublet.hydrogen_shifts == 'wide':
                 self.stub_combinations.update({
                     # (B_C)-1: could be B_C-1 or B+1_C (use B_C-1 here)
                     f'({stubs[0].name}_{stubs[1].name})-1':
