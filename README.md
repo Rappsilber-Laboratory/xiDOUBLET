@@ -1,5 +1,7 @@
 # xiDOUBLET
 
+Citation: Cleavable Cross-Linkers Redefined by a Novel MS3-Trigger Algorithm; Lars Kolbowski, Lutz Fischer, and Juri Rappsilber, Analytical Chemistry 2023 95 (42), 15461-15464, DOI: https://doi.org/10.1021/acs.analchem.3c01673
+
 ## Using xiDOUBLET
 
 
